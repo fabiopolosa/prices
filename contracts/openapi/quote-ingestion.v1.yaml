@@ -1,0 +1,67 @@
+openapi: 3.1.0
+info:
+  title: Quote Ingestion Service
+  version: 1.0.0
+paths:
+  /v1/ingest/merchant:
+    post:
+      summary: Ingest merchant-authoritative quote
+      responses:
+        "202":
+          description: Accepted
+  /v1/ingest/ugc:
+    post:
+      summary: Ingest user-generated quote
+      responses:
+        "202":
+          description: Accepted
+  /v1/ingest/call-confirmed:
+    post:
+      summary: Ingest call-confirmed quote
+      responses:
+        "202":
+          description: Accepted
+  /v1/canonical-quotes:
+    get:
+      summary: List canonical quote records
+      responses:
+        "200":
+          description: Canonical quotes
+  /v1/review-queue:
+    get:
+      summary: List recoverable ingestion failures
+      responses:
+        "200":
+          description: Review queue entries
+  /v1/confidence-projection:
+    get:
+      summary: List confidence projection materialization state
+      responses:
+        "200":
+          description: Projection entries
+  /v1/event-consumers:
+    get:
+      summary: List event consumer offsets and idempotency stats
+      responses:
+        "200":
+          description: Consumer state
+  /v1/replay:
+    post:
+      summary: Replay the event log into a consumer for backfill/rebuild
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                consumerName: { type: string }
+                fromSequence: { type: integer, minimum: 1 }
+                toSequence: { type: integer, minimum: 1 }
+                direction: { type: string, enum: [asc, desc] }
+                resetConsumerState: { type: boolean }
+      responses:
+        "202":
+          description: Replay accepted
+        "400":
+          description: Invalid replay request

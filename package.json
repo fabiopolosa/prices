@@ -1,10 +1,17 @@
 {
-  "name": "prices-ingestion-service",
+  "name": "prices-services-monorepo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "services/*"
+  ],
   "scripts": {
-    "start": "node src/server.js",
-    "test": "node --test"
+    "db:migrate": "bash database/scripts/migrate.sh",
+    "db:seed": "bash database/scripts/seed.sh",
+    "db:health": "bash database/scripts/healthcheck.sh",
+    "db:backup-restore-smoke": "bash database/scripts/backup_restore_smoke.sh",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   }
 }

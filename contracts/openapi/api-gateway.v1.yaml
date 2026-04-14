@@ -1,0 +1,113 @@
+openapi: 3.1.0
+info:
+  title: API Gateway
+  version: 1.0.0
+paths:
+  /v1/quotes:read:
+    get:
+      summary: Query latest canonical quotes
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: area
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 25
+        - in: header
+          name: x-actor-role
+          required: false
+          schema:
+            type: string
+            enum: [consumer, moderator, ops, admin]
+      responses:
+        "200":
+          description: Canonical quote response envelope
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  retrievalVersion:
+                    type: string
+                  totalCandidates:
+                    type: integer
+                  totalResults:
+                    type: integer
+                  role:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        canonicalPriceId:
+                          type: string
+                        confidence:
+                          type: number
+                        explainability:
+                          type: object
+                          properties:
+                            finalScore:
+                              type: number
+                            lexicalScore:
+                              type: number
+                            semanticScore:
+                              type: number
+                            structuredFilterScore:
+                              type: number
+                            matchedTerms:
+                              type: array
+                              items:
+                                type: string
+                        lineage:
+                          type: object
+                          properties:
+                            sourceTypes:
+                              type: array
+                              items:
+                                type: string
+                            ontology:
+                              type: object
+                              properties:
+                                service:
+                                  type: string
+                                version:
+                                  type: string
+                                termKeys:
+                                  type: array
+                                  items:
+                                    type: string
+                            clustering:
+                              type: object
+                              properties:
+                                service:
+                                  type: string
+                                version:
+                                  type: string
+                                clusterKey:
+                                  type: string
+                                areaKey:
+                                  type: string
+  /v1/quotes:ingest:
+    post:
+      summary: Proxy quote ingestion payload to quote-ingestion service
+      responses:
+        "202":
+          description: Accepted for asynchronous processing
+  /v1/health:
+    get:
+      summary: Gateway liveness
+      responses:
+        "200":
+          description: Service healthy

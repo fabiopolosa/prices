@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  title: Map Layer Service
+  version: 1.0.0
+paths:
+  /v1/health:
+    get:
+      summary: Service liveness
+      responses:
+        "200":
+          description: Service healthy
+  /v1/map/stores:
+    get:
+      summary: List stores for a viewport
+      parameters:
+        - in: query
+          name: snapshotId
+          schema:
+            type: string
+        - in: query
+          name: bbox
+          schema:
+            type: string
+          description: minLng,minLat,maxLng,maxLat
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+      responses:
+        "200":
+          description: Store geospatial features
+  /v1/map/prices:
+    get:
+      summary: Return map-ready pricing overlays
+      parameters:
+        - in: query
+          name: snapshotId
+          schema:
+            type: string
+        - in: query
+          name: layer
+          required: true
+          schema:
+            type: string
+            enum: [coverage, demand, anomaly]
+        - in: query
+          name: bbox
+          schema:
+            type: string
+          description: minLng,minLat,maxLng,maxLat
+        - in: query
+          name: version
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Overlay features
+        "409":
+          description: Requested version mismatches latest manifest
+  /v1/layers/manifests/latest:
+    get:
+      summary: List latest manifest versions for each layer type
+      parameters:
+        - in: query
+          name: snapshotId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Latest manifests for coverage, demand, and anomaly
+  /v1/layers/build:
+    post:
+      summary: Build layer manifests for a snapshot
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                snapshotId:
+                  type: string
+                layerType:
+                  type: string
+                  enum: [coverage, demand, anomaly]
+      responses:
+        "202":
+          description: Layer build completed and manifests are available
+        "400":
+          description: Invalid build request
+  /v1/metrics:
+    get:
+      summary: Read path and layer generation latency/failure metrics
+      responses:
+        "200":
+          description: Operational metrics snapshot

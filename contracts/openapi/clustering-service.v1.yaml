@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Clustering Service
+  version: 1.0.0
+paths:
+  /v1/clusters/stores/{storeKey}:
+    get:
+      summary: Resolve cluster assignment for a canonical store key
+      parameters:
+        - in: path
+          name: storeKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store cluster projection
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - storeKey
+                  - clusterVersion
+                  - cluster
+                  - lineage
+                properties:
+                  storeKey:
+                    type: string
+                  clusterVersion:
+                    type: string
+                  cluster:
+                    type: object
+                    required:
+                      - key
+                      - label
+                      - areaKey
+                      - confidence
+                    properties:
+                      key:
+                        type: string
+                      label:
+                        type: string
+                      areaKey:
+                        type: string
+                      confidence:
+                        type: number
+                  lineage:
+                    type: object
+                    required:
+                      - sourceTable
+                      - sourceVersion
+                    properties:
+                      sourceTable:
+                        type: string
+                      sourceVersion:
+                        type: string
+        "404":
+          description: Store cluster unavailable
+  /v1/clusters/areas/{areaKey}:
+    get:
+      summary: List clusters for an area
+      parameters:
+        - in: path
+          name: areaKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cluster list for area
+  /v1/health:
+    get:
+      summary: Clustering service liveness
+      responses:
+        "200":
+          description: Service healthy

@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: Knowledge Service
+  version: 1.0.0
+paths:
+  /v1/retrieval/search:
+    get:
+      summary: Hybrid retrieval for product and store quote read path
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: area
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 25
+      responses:
+        "200":
+          description: Ranked canonical quote cards with explainability and lineage metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  retrievalVersion:
+                    type: string
+                  query:
+                    type: string
+                  area:
+                    type: [string, "null"]
+                  totalCandidates:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - canonicalPriceId
+                        - confidence
+                        - explainability
+                        - lineage
+                      properties:
+                        canonicalPriceId:
+                          type: string
+                        confidence:
+                          type: number
+                        explainability:
+                          type: object
+                          required:
+                            - retrievalVersion
+                            - finalScore
+                            - lexicalScore
+                            - semanticScore
+                            - structuredFilterScore
+                            - matchedTerms
+                          properties:
+                            retrievalVersion:
+                              type: string
+                            finalScore:
+                              type: number
+                            lexicalScore:
+                              type: number
+                            semanticScore:
+                              type: number
+                            structuredFilterScore:
+                              type: number
+                            matchedTerms:
+                              type: array
+                              items:
+                                type: string
+                        lineage:
+                          type: object
+                          required:
+                            - sourceTypes
+                            - ontology
+                            - clustering
+                          properties:
+                            sourceTypes:
+                              type: array
+                              items:
+                                type: string
+                            ontology:
+                              type: object
+                              required:
+                                - service
+                                - version
+                                - termKeys
+                              properties:
+                                service:
+                                  type: string
+                                version:
+                                  type: string
+                                termKeys:
+                                  type: array
+                                  items:
+                                    type: string
+                            clustering:
+                              type: object
+                              required:
+                                - service
+                                - version
+                                - clusterKey
+                                - areaKey
+                              properties:
+                                service:
+                                  type: string
+                                version:
+                                  type: string
+                                clusterKey:
+                                  type: string
+                                areaKey:
+                                  type: string
+  /v1/entities/products/{productKey}:
+    get:
+      summary: Resolve canonical product metadata by key
+      parameters:
+        - in: path
+          name: productKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product entity
+  /v1/entities/stores/{storeKey}:
+    get:
+      summary: Resolve canonical store metadata by key
+      parameters:
+        - in: path
+          name: storeKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store entity

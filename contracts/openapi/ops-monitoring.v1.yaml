@@ -1,0 +1,146 @@
+openapi: 3.1.0
+info:
+  title: Ops Monitoring Service
+  version: 1.0.0
+paths:
+  /v1/health:
+    get:
+      summary: Liveness and readiness snapshot
+      responses:
+        "200":
+          description: Health report
+  /v1/slo:
+    get:
+      summary: Service level objective rollups for pilot city/category
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        "200":
+          description: SLO status and burn rates
+  /v1/dashboard:
+    get:
+      summary: Go/no-go dashboard view for pilot KPI and SLO panels
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Dashboard cards and panel metadata
+  /v1/telemetry/contracts:
+    get:
+      summary: Metric contract and owner map for pilot KPI/SLO telemetry
+      responses:
+        "200":
+          description: Metric ownership and unit definitions
+  /v1/telemetry/signals:
+    get:
+      summary: Latest labeled telemetry snapshot for a city/category scope
+      parameters:
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current metric values with labels and owner metadata
+  /v1/telemetry/emit:
+    post:
+      summary: Emit labeled telemetry samples for KPI/SLO metrics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                category:
+                  type: string
+                source:
+                  type: string
+                labels:
+                  type: object
+                  additionalProperties:
+                    type: string
+                metric:
+                  type: string
+                value:
+                  type: number
+                signals:
+                  type: object
+                  properties:
+                    activationRate:
+                      type: number
+                    day7RetentionRate:
+                      type: number
+                    dataQualityCoverage:
+                      type: number
+                    ingestionFailureRate:
+                      type: number
+                    retrievalRegressionRate:
+                      type: number
+                    mapReadP95LatencyMs:
+                      type: number
+      responses:
+        "202":
+          description: Metric samples accepted and incorporated in scope snapshot
+        "400":
+          description: Invalid telemetry payload
+  /v1/alerts/rules:
+    get:
+      summary: List configured alert rules with runbook and responder routing
+      responses:
+        "200":
+          description: Alert rule configuration
+  /v1/alerts/dry-run:
+    post:
+      summary: Evaluate alert rules against supplied signal snapshots
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                city:
+                  type: string
+                category:
+                  type: string
+                signals:
+                  type: object
+                  properties:
+                    activationRate:
+                      type: number
+                    day7RetentionRate:
+                      type: number
+                    dataQualityCoverage:
+                      type: number
+                    ingestionFailureRate:
+                      type: number
+                    retrievalRegressionRate:
+                      type: number
+                    mapReadP95LatencyMs:
+                      type: number
+      responses:
+        "200":
+          description: Dry-run alert evaluation with trigger evidence
+        "400":
+          description: Invalid request payload

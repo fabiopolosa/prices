@@ -1,0 +1,11 @@
+{
+  "name": "@prices/quote-ingestion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "build": "node --check src/server.js && node --check src/ingestionService.js && node --check src/normalization.js && node --check src/dataStore.js && node --check src/eventBus.js && node --check src/eventConsumers.js",
+    "test": "node --test"
+  }
+}

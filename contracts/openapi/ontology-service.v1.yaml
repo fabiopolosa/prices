@@ -1,0 +1,81 @@
+openapi: 3.1.0
+info:
+  title: Ontology Service
+  version: 1.0.0
+paths:
+  /v1/ontology/products/{productKey}:
+    get:
+      summary: Resolve ontology terms for a canonical product key
+      parameters:
+        - in: path
+          name: productKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Product ontology projection
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - productKey
+                  - ontologyVersion
+                  - terms
+                  - lineage
+                properties:
+                  productKey:
+                    type: string
+                  ontologyVersion:
+                    type: string
+                  terms:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - termKey
+                        - domain
+                        - label
+                        - confidence
+                      properties:
+                        termKey:
+                          type: string
+                        domain:
+                          type: string
+                        label:
+                          type: string
+                        confidence:
+                          type: number
+                  lineage:
+                    type: object
+                    required:
+                      - sourceTable
+                      - sourceVersion
+                    properties:
+                      sourceTable:
+                        type: string
+                      sourceVersion:
+                        type: string
+        "404":
+          description: Product ontology unavailable
+  /v1/ontology/stores/{storeKey}:
+    get:
+      summary: Resolve ontology terms for a canonical store key
+      parameters:
+        - in: path
+          name: storeKey
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Store ontology projection
+        "404":
+          description: Store ontology unavailable
+  /v1/health:
+    get:
+      summary: Ontology service liveness
+      responses:
+        "200":
+          description: Service healthy

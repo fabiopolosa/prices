@@ -1,0 +1,59 @@
+asyncapi: 3.0.0
+info:
+  title: Quote Event Contracts
+  version: 1.0.0
+channels:
+  quote.ingested.v1:
+    address: quote.ingested.v1
+    messages:
+      quoteIngested:
+        payload:
+          type: object
+          required:
+            [
+              submissionId,
+              source,
+              canonicalQuoteId,
+              confidence,
+              latestPrice,
+              currency,
+              receivedAt
+            ]
+          properties:
+            submissionId: { type: string, format: uuid }
+            canonicalQuoteId: { type: string, format: uuid }
+            source: { type: string, enum: [merchant, ugc, call_confirmed] }
+            confidence: { type: number, minimum: 0, maximum: 1 }
+            winningSource: { type: string }
+            latestPrice: { type: number }
+            currency: { type: string, minLength: 3, maxLength: 3 }
+            sourceEventId: { type: string }
+            idempotencyKey: { type: string }
+            receivedAt: { type: string, format: date-time }
+  quote.confidence.v1:
+    address: quote.confidence.v1
+    messages:
+      quoteConfidence:
+        payload:
+          type: object
+          required:
+            [
+              canonicalQuoteId,
+              source,
+              submissionId,
+              confidence,
+              confidenceBand,
+              latestPrice,
+              currency
+            ]
+          properties:
+            canonicalQuoteId: { type: string, format: uuid }
+            source: { type: string, enum: [merchant, ugc, call_confirmed] }
+            submissionId: { type: string, format: uuid }
+            confidence: { type: number, minimum: 0, maximum: 1 }
+            confidenceBand: { type: string, enum: [low, medium, high] }
+            winningSource: { type: string }
+            latestPrice: { type: number }
+            currency: { type: string, minLength: 3, maxLength: 3 }
+            sourceEventId: { type: string }
+            idempotencyKey: { type: string }
